@@ -16,8 +16,8 @@ export default async function handler(req, res) {
 
     if (!videoId) return res.status(400).json({ status: 'error', message: 'Invalid YouTube URL' });
 
-    // Official rapidapi endpoint from playground
-    const apiUrl = `https://youtube-video-fast-downloader-24-7.p.rapidapi.com/Get%20Video%20Download%20URL?videoId=${videoId}&quality=18&trim_start_time=${start || 0}&trim_duration=${duration || 30}`;
+    // Correct backend endpoint for Spicy-Laika RapidAPI
+    const apiUrl = `https://youtube-video-fast-downloader-24-7.p.rapidapi.com/download_video/${videoId}?trim_start_time=${start || 0}&trim_duration=${duration || 30}`;
 
     const response = await fetch(apiUrl, {
       method: 'GET',
@@ -28,12 +28,12 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-    const downloadUrl = data.downloadUrl || data.download_url || data.url || data.link || (data.data && (data.data.downloadUrl || data.data.url));
+    const downloadUrl = data.file || data.downloadUrl || data.download_url || data.url || data.link;
 
     if (downloadUrl) {
       return res.status(200).json({ status: 'success', download_url: downloadUrl });
     } else {
-      return res.status(500).json({ status: 'error', message: data.message || 'Download link not generated' });
+      return res.status(500).json({ status: 'error', message: data.comment || data.message || 'Download link not generated' });
     }
   } catch (error) {
     return res.status(500).json({ status: 'error', message: error.message });
