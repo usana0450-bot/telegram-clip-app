@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Viral Clip Generator</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PASTE YOUR MONETAG AD SCRIPT HERE -->
+</head>
+<body class="bg-gray-900 text-white min-h-screen p-5 flex flex-col justify-center items-center">
+
+    <div class="max-w-md w-full bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700">
+        <h1 class="text-2xl font-bold text-center text-blue-400 mb-2">⚡ AI Video Clipper</h1>
+        <p class="text-xs text-center text-gray-400 mb-6">Paste YouTube Long Video URL & Get Viral Short Clips</p>
+
+        <!-- Input Box -->
+        <label class="block text-sm mb-1 text-gray-300">YouTube Video Link</label>
+        <input id="ytUrl" type="text" placeholder="https://youtube.com/watch?v=..." class="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:border-blue-500 mb-4 text-sm">
+
+        <!-- Controls -->
+        <div class="grid grid-cols-2 gap-3 mb-6">
+            <div>
+                <label class="block text-xs text-gray-400 mb-1">Start Time (Sec)</label>
+                <input id="startTime" type="number" value="10" class="w-full p-2 bg-gray-700 rounded-lg text-center border border-gray-600">
+            </div>
+            <div>
+                <label class="block text-xs text-gray-400 mb-1">Duration (Sec)</label>
+                <input id="duration" type="number" value="20" class="w-full p-2 bg-gray-700 rounded-lg text-center border border-gray-600">
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button id="convertBtn" onclick="processClip()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition duration-200">
+            🎬 Generate Clip
+        </button>
+
+        <!-- Loader & Status -->
+        <div id="status" class="hidden text-center mt-4 text-sm text-yellow-400 animate-pulse">
+            Processing Video... Please wait (~15-30s)
+        </div>
+
+        <!-- Result -->
+        <div id="result" class="hidden mt-6 text-center">
+            <p class="text-green-400 text-sm font-semibold mb-3">✅ Clip Ready!</p>
+            <button onclick="downloadClip()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl">
+                ⬇️ Download Clip
+            </button>
+        </div>
+    </div>
+
+    <script>
+  const API_BASE_URL = "https://solid-friends-bet.loca.lt"; 
+
+  async function processClip() {
+    const url = document.getElementById('ytUrl').value;
+    const start = parseInt(document.getElementById('startTime').value);
+    const duration = parseInt(document.getElementById('duration').value);
+
+    if(!url) { alert("Please paste a valid YouTube URL"); return; }
+
+    document.getElementById('status').classList.remove('hidden');
+    document.getElementById('convertBtn').disabled = true;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/convert`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Bypass-Tunnel-Reminder': 'true'
+        },
+        body: JSON.stringify({ url, start, duration })
+      });
+
+      const data = await response.json();
+      if(data.status === "success") {
+        document.getElementById('status').classList.add('hidden');
+        document.getElementById('result').classList.remove('hidden');
+        
+        // Automatic download
+        window.location.href = `${API_BASE_URL}/get-clip`;
+      } else {
+        alert("Error: " + data.message);
+      }
+    } catch (err) {
+      alert("Error processing video. Make sure Colab server is running.");
+    } finally {
+      document.getElementById('status').classList.add('hidden');
+      document.getElementById('convertBtn').disabled = false;
+    }
+  }
+
+  function downloadClip() {
+    window.open(`${API_BASE_URL}/get-clip`, '_blank');
+  }
+</script>
+</body>
+</html>
