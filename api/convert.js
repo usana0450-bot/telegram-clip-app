@@ -27,12 +27,14 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-    const downloadUrl = data.downloadUrl || data.url || data.link;
+    
+    // Extract download URL from multiple possible API structures
+    const downloadUrl = data.downloadUrl || data.download_url || data.url || data.link || (data.data && (data.data.downloadUrl || data.data.url)) || (Array.isArray(data) && data[0]?.url);
 
     if (downloadUrl) {
       return res.status(200).json({ status: 'success', download_url: downloadUrl });
     } else {
-      return res.status(500).json({ status: 'error', message: 'Failed to extract download link' });
+      return res.status(500).json({ status: 'error', message: data.message || 'API response format changed', debug: data });
     }
   } catch (error) {
     return res.status(500).json({ status: 'error', message: error.message });
