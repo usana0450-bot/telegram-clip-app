@@ -16,7 +16,7 @@ export default async function handler(req, res) {
 
     if (!videoId) return res.status(400).json({ status: 'error', message: 'Invalid YouTube URL' });
 
-    const apiUrl = `https://youtube-video-fast-downloader-24-7.p.rapidapi.com/get-video-download-url?videoId=${videoId}&quality=360&trim_start_time=${start || 0}&trim_duration=${duration || 30}`;
+    const apiUrl = `https://youtube-video-fast-downloader-24-7.p.rapidapi.com/get-download-url?videoId=${videoId}&quality=360&trim_start_time=${start || 0}&trim_duration=${duration || 30}`;
 
     const response = await fetch(apiUrl, {
       method: 'GET',
@@ -27,14 +27,12 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-    
-    // Extract download URL from multiple possible API structures
-    const downloadUrl = data.downloadUrl || data.download_url || data.url || data.link || (data.data && (data.data.downloadUrl || data.data.url)) || (Array.isArray(data) && data[0]?.url);
+    const downloadUrl = data.downloadUrl || data.download_url || data.url || data.link || (data.data && (data.data.downloadUrl || data.data.url));
 
     if (downloadUrl) {
       return res.status(200).json({ status: 'success', download_url: downloadUrl });
     } else {
-      return res.status(500).json({ status: 'error', message: data.message || 'API response format changed', debug: data });
+      return res.status(500).json({ status: 'error', message: data.message || 'Failed to extract download link' });
     }
   } catch (error) {
     return res.status(500).json({ status: 'error', message: error.message });
