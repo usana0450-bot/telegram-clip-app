@@ -50,7 +50,7 @@
     </div>
 
     <script>
-  const API_BASE_URL = "https://solid-friends-bet.loca.lt"; 
+  const API_BASE_URL = ""; 
 
   async function processClip() {
     const url = document.getElementById('ytUrl').value;
@@ -63,7 +63,7 @@
     document.getElementById('convertBtn').disabled = true;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/convert`, {
+      const response = await fetch('/api/convert', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
